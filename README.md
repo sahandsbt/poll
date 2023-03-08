@@ -1,5 +1,5 @@
 # Poll_Project
-A poll project by Sahand Sabet
+A poll project by Sahand Sabet with python object oriented
 
 Please keep the copy right of project, I really worked hard for this and i trust you <3
 
