@@ -1,5 +1,5 @@
 '''
-Programmed by Sahand Sabet
+Programmed by Sahand Sabet (https://github.com/SahandSbt)
 Poll project with object oriented
 Copy Righted by Apache License
 '''
