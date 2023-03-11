@@ -10,7 +10,7 @@ Please keep the copy right of project, I really worked hard for this and i trust
 5- Don't delete database.txt and votes.txt
 6- Other files will recover if you delete
 7- Project uses md5 method to keep passwords
-8- In project, I used os.system() for Microsoft Windows Operating System; Change it for another OS
+8- In project, I used os.system() for most Operating Systems; You may need to change it
 9- Deleting part soon!
 10- Diagram soon!
 
