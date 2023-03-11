@@ -6,7 +6,7 @@ Copy Righted by Apache License
 
 #-----------(Library)-----------
 
-import os                   # Attention! os.system() used for Microsoft Windows Command Prompt 
+import os
 import hashlib as hash
 
 #-----------(Poll_Init)-----------
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         input("\n ** Press Enter To Exit **")
         exit()
     user.recover()
-    os.system('cls')
+    os.system('cls' if os.name=='nt' else 'clear')
     while True:
         CLI()
-        os.system('cls')
+        os.system('cls' if os.name=='nt' else 'clear')
