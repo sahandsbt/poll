@@ -11,6 +11,7 @@ Please keep the copy right of project, I really worked hard for this and i trust
 6- Other files will recover if you delete
 7- Project uses md5 method to keep passwords
 8- In project, I used os.system() for most Operating Systems; You may need to change it
-9- Deleting part soon!
-10- Diagram soon!
+9- Deleting a poll and regenerating ID's Added
+10- Email verification with Rejex
+11- Diagram soon!
 

@@ -25,6 +25,20 @@ class PollInit:
             text = i.split(',')
             print('\n ** ' , text[0] , ',' , text[1] , end = '')
         print('')
+    
+    def re_ID(self):
+        votes = []
+        with open('votes.txt','r') as f:
+            votes = f.readlines()
+        for i in range(len(votes)):
+            temp = votes[i].split(',')
+            vote_str = str(i)
+            for j in range(1,len(temp)):
+                vote_str = vote_str + ',' + str(temp[j])
+            votes[i] = vote_str
+        with open('votes.txt','w') as f:
+            for i in votes:
+                f.write(i)
 
 #-----------(Main User)-----------
 
@@ -100,6 +114,25 @@ class User:
             f.write(add + '\n')
         Poll.vote_list.append(add)
         self.update_lists()
+    
+    def delete(self,ID):
+        if str(ID) not in self.created_list:
+            print(" ** You didn't create this poll! ")
+            return
+        self.created_list.remove(str(ID))
+        with open('votes.txt','r') as f:
+            ops = f.readlines()
+            for i in range(len(ops)):
+                info = ops[i].split(',')
+                if info[0] == str(ID):
+                    ops[i] = 'temp'
+            with open('votes.txt','w') as fi:
+                for i in ops:
+                    if 'temp' not in i:
+                        fi.write(i)
+        self.update_lists()
+        
+        
 
 #-----------(Admin)-----------     
 
@@ -152,7 +185,7 @@ class Authenticator:
 
 def CLI():
     print(" ** Welcome To Poll Project! **\n")
-    print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Exit")
+    print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Delete a poll\n -- 5. Exit")
     choice = int(input(" => "))
 
     if choice == 1:
@@ -188,6 +221,13 @@ def CLI():
         user.recover()
 
     elif choice == 4:
+        ID = int(input("\n ** Enter the poll ID:\n => "))
+        user.delete(ID)
+        Poll.re_ID()
+        print("\n ** Poll Successfully deleted !")
+        Poll.vote_recovery()
+
+    elif choice == 5:
         exit()
 
     else:
