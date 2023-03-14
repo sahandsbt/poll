@@ -7,6 +7,7 @@ Copy Righted by Apache License
 #-----------(Library)-----------
 
 import os
+import re
 import hashlib as hash
 
 #-----------(Poll_Init)-----------
@@ -15,7 +16,7 @@ class PollInit:
     def __init__(self):
         self.vote_list = []
 
-    def vote_recovery(self): 
+    def vote_recovery(self):                 
         with open('votes.txt','r') as f:
             self.vote_list = f.readlines()
 
@@ -28,31 +29,31 @@ class PollInit:
 #-----------(Main User)-----------
 
 class User:
-    def __init__(self,username,password):
-        self.username = username
+    def __init__(self,email,password):
+        self.email = email
         self.password = password
         self.user_list = []
 
     def recover(self):
         try:
-            with open(self.username + '.txt','r') as f:
+            with open(self.email + '.txt','r') as f:
                 self.user_list = f.readlines()
         except:
-            with open(self.username + '.txt','w') as f:
+            with open(self.email + '.txt','w') as f:
                 f.write('')
 
 #-----------(Participator)-----------
 
 class Participator(User):
-    def __init__(self,username,password):
-        super().__init__(username,password)
+    def __init__(self,email,password):
+        super().__init__(email,password)
     
     def participate(self,ID,option):
         for i in range(len(user.user_list)):
             if str(ID) in user.user_list[i-1]:
                 print("You participated before!")
                 return
-        with open(self.username + '.txt','a') as f:
+        with open(self.email + '.txt','a') as f:
             f.write(str(ID) + '\n')
         with open('votes.txt','r') as f:
             ops = f.readlines()
@@ -74,8 +75,8 @@ class Participator(User):
 #-----------(Admin)-----------     
 
 class Admin(User):
-    def __init__(self,username,password):
-        super().__init__(username,password)
+    def __init__(self,email,password):
+        super().__init__(email,password)
 
     def create(self,ID,title,options):
         options_str = ''
@@ -91,10 +92,10 @@ class Admin(User):
 #-----------(Login)-----------
 
 class Login:
-    def __init__(self, username, password):
-        self.username = username
-        md5 = hash.md5(str(password).encode('utf-8'))
-        self.password = md5.hexdigest()
+    def __init__(self, email, password):
+        self.email = email
+        md5_temp = hash.md5(str(password).encode('utf-8'))
+        self.password = md5_temp.hexdigest()
 
     def login(self):
         data = []
@@ -102,20 +103,27 @@ class Login:
             data = f.readlines()
         for i in data:
             person = i.split(',')
-            if person[0] == self.username:
-                if person[1] == self.password:
+            if person[0] == self.email:
+                if person[1] == self.email:
                     return person[2]
                 else:
                     return "deny"
         return "deny"
     
-    def register(self,model):
-        if model not in ['Admin','Participator']:
+    def register(self, repeat_password, model):
+        md5_temp = hash.md5(str(repeat_password).encode('utf-8'))
+        repeat_password = md5_temp.hexdigest()
+        email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        if not re.match(email_regex, self.email):
+            print(" ** Wrong Email Syntax !")
+            input("\n ** Press Enter To Reset **")
+            exit()
+        if model not in ['Admin','Participator'] or self.password != repeat_password:
             print(" ** Wrong Syntax !")
             input("\n ** Press Enter To Reset **")
             exit()
         with open('database.txt','a') as f:
-            text = str(self.username) + ',' + str(self.password) + ',' + model + '\n'
+            text = str(self.email) + ',' + str(self.password) + ',' + model + '\n'
             f.write(text)
         return model
 
@@ -177,15 +185,16 @@ if __name__ == "__main__":
     Poll = PollInit()
     Poll.vote_recovery()
     status = input(" ** Enter your purpose (Register/Login): ")
-    login_username = input(" ** Enter your username: ")
+    login_email = input(" ** Enter your email: ")
     login_password = input(" ** Enter your password: ")
     log = None
-    log = Login(login_username , login_password)
+    log = Login(login_email , login_password)
     if status == 'Login':
         result = log.login()
     elif status == 'Register':
+        reapeat_password = input(" ** Enter your password again: ")
         login_model = input(" ** Enter your character (Admin/Participator): ")
-        result = log.register(login_model)
+        result = log.register(reapeat_password, login_model)
     else:
         print("\n ** Wrong Syntax !")
         input("\n ** Press Enter To Reset **")
@@ -193,11 +202,11 @@ if __name__ == "__main__":
     user = None
     print('>'+result)
     if 'Admin' in result:
-        user = Admin(login_username , login_password)
+        user = Admin(login_email , login_password)
     elif 'Participator' in result:
-        user = Participator(login_username , login_password)
+        user = Participator(login_email , login_password)
     else:
-        print(" ** Wrong Username Or Password !")
+        print(" ** Wrong email Or Password !")
         input("\n ** Press Enter To Exit **")
         exit()
     user.recover()
