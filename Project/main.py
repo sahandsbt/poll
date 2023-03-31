@@ -17,7 +17,7 @@ class PollInit:
         self.vote_list = []
 
     def vote_recovery(self):                 
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             self.vote_list = f.readlines()
 
     def print_list(self):
@@ -25,10 +25,10 @@ class PollInit:
             text = i.split(',')
             print('\n ** ' , text[0] , ',' , text[1] , ',' , text[2] , end = '')
         print('')
-    
+
     def re_ID(self):
         votes = []
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             votes = f.readlines()
         for i in range(len(votes)):
             temp = votes[i].split(',')
@@ -36,7 +36,7 @@ class PollInit:
             for j in range(1,len(temp)):
                 vote_str = vote_str + ',' + str(temp[j])
             votes[i] = vote_str
-        with open('votes.txt','w') as f:
+        with open('data/votes.txt','w') as f:
             for i in votes:
                 f.write(i)
 
@@ -53,7 +53,7 @@ class User:
         self.participated_list = []
         self.created_list = []
         try:
-            with open(self.email + '.txt','r') as f:
+            with open('data/' + self.email + '.txt','r') as f:
                 participated_list_temp = f.readline().split(',')
                 created_list_temp = f.readline().split(',')
                 for i in participated_list_temp:
@@ -63,7 +63,7 @@ class User:
                     if i != '' and i != '\n':
                         self.created_list.append(i)
         except:
-            with open(self.email + '.txt','w') as f:
+            with open('data/' + self.email + '.txt','w') as f:
                 f.write('')
     
     def update_lists(self):
@@ -73,7 +73,7 @@ class User:
             participated_str = participated_str + self.participated_list[i] + ','
         for i in range(len(self.created_list)):
             created_str = created_str + self.created_list[i] + ','
-        with open(self.email + '.txt','w') as f:
+        with open('data/' + self.email + '.txt','w') as f:
             f.write(participated_str + '\n' + created_str)
 
 
@@ -82,7 +82,7 @@ class User:
             print("You participated before!")
             return
         self.participated_list.append(str(ID))
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             ops = f.readlines()
             for i in range(len(ops)):
                 info = ops[i].split(',')
@@ -100,10 +100,11 @@ class User:
                     if re.match(re.compile(r'^[0-9]+'),txt[-1:]):
                         txt += '\n'
                     ops[i] = txt
-            with open('votes.txt','w') as fi:
+            with open('data/votes.txt','w') as fi:
                 for i in ops:
                     fi.write(i)
         self.update_lists()
+        print("\n ** Poll Successfully Voted !")
 
     def create(self,ID,title,options):
         self.created_list.append(str(ID))
@@ -113,33 +114,35 @@ class User:
             options_str += str(i)
             options_str += ',0'
         add = str(ID) + ',active,' + title + options_str
-        with open('votes.txt','a') as f:
+        with open('data/votes.txt','a') as f:
             f.write(add + '\n')
         Poll.vote_list.append(add)
         self.update_lists()
+        print("\n ** Poll Successfully Created !")
     
     def delete(self,ID):
         if str(ID) not in self.created_list:
             print(" ** You didn't create this poll! ")
             return
         self.created_list.remove(str(ID))
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             ops = f.readlines()
             for i in range(len(ops)):
                 info = ops[i].split(',')
                 if info[0] == str(ID):
                     ops[i] = 'temp'
-            with open('votes.txt','w') as fi:
+            with open('data/votes.txt','w') as fi:
                 for i in ops:
                     if 'temp' not in i:
                         fi.write(i)
         self.update_lists()
+        print("\n ** Poll Successfully deleted !")
         
     def change_activation(self,ID):
         if str(ID) not in self.created_list:
             print(" ** You didn't create this poll! ")
             return
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             ops = f.readlines()
             for i in range(len(ops)):
                 info = ops[i].split(',')
@@ -156,10 +159,11 @@ class User:
                     if re.match(re.compile(r'^[0-9]+'),txt[-1:]):
                         txt += '\n'
                     ops[i] = txt
-            with open('votes.txt','w') as fi:
+            with open('data/votes.txt','w') as fi:
                 for i in ops:
                     fi.write(i)
         self.update_lists()
+        print("\n ** Poll Activation Successfully Changed !")
 
 #-----------(Admin)-----------     
 
@@ -170,17 +174,18 @@ class Admin(User):
     def delete(self,ID):
         if str(ID) in self.created_list:
             self.created_list.remove(str(ID))
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             ops = f.readlines()
             for i in range(len(ops)):
                 info = ops[i].split(',')
                 if info[0] == str(ID):
                     ops[i] = 'temp'
-            with open('votes.txt','w') as fi:
+            with open('data/votes.txt','w') as fi:
                 for i in ops:
                     if 'temp' not in i:
                         fi.write(i)
         self.update_lists()
+        print("\n ** Poll Successfully deleted !")
 
 #-----------(Authenticator)-----------
 
@@ -194,8 +199,9 @@ class Authenticator:
         md5_temp = hash.md5(str(repeat_password).encode('utf-8'))
         repeat_password = md5_temp.hexdigest()
         email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-        if not re.match(email_regex, self.email):
-            print(" ** Wrong Email Syntax !")
+        password_regex = re.compile(r'[a-zA-Z]+')
+        if not re.match(email_regex, self.email) or not re.match(password_regex, self.password):
+            print(" ** Wrong Email / Password Syntax !")
             input("\n ** Press Enter To Reset **")
             exit()
         if model not in ['Admin','User'] or self.password != repeat_password:
@@ -213,7 +219,7 @@ class Login:
 
     def login(self):
         data = []
-        with open('database.txt','r') as f:
+        with open('data/database.txt','r') as f:
             data = f.readlines()
         for i in data:
             person = i.split(',')
@@ -226,7 +232,7 @@ class Login:
     
     def register(self, model):
         
-        with open('database.txt','a') as f:
+        with open('data/database.txt','a') as f:
             text = str(self.email) + ',' + str(self.password) + ',' + model + '\n'
             f.write(text)
         return model
@@ -235,7 +241,7 @@ class Login:
 
 def CLI():
     print(" ** Welcome To Poll Project! **\n")
-    print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Delete a poll\n -- 5. Change activation\n -- 6. Exit")
+    print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Delete a poll\n -- 5. Change activation\n -- 6. My polls\n -- 7. Exit")
     choice = int(input(" => "))
 
     if choice == 1:
@@ -246,11 +252,10 @@ def CLI():
         for i in range(number):
             option = input(" ** Option " + str(i+1) + " : ")
             options.append(option)
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             temp = f.readlines()
             ID_maker = len(temp)
         user.create(ID_maker,title,options)
-        print("\n ** Poll Successfully Created !")
         Poll.vote_recovery()
 
     elif choice == 2:
@@ -258,7 +263,7 @@ def CLI():
 
     elif choice == 3:
         ID = int(input("\n ** Enter the poll ID:\n => "))
-        with open('votes.txt','r') as f:
+        with open('data/votes.txt','r') as f:
             ops = f.readlines()
             for i in range(len(ops)):
                 info = ops[i].split(',')
@@ -267,23 +272,29 @@ def CLI():
                         print(' -> ' , info[j])
         vote = input("Enter your option: ")
         user.participate(ID,vote)
-        print("\n ** Poll Successfully Voted !")
         user.recover()
 
     elif choice == 4:
         ID = int(input("\n ** Enter the poll ID:\n => "))
         user.delete(ID)
         Poll.re_ID()
-        print("\n ** Poll Successfully deleted !")
         Poll.vote_recovery()
 
     elif choice == 5:
         ID = int(input("\n ** Enter the poll ID:\n => "))
         user.change_activation(ID)
-        print("\n ** Poll Activation Successfully Changed !")
         Poll.vote_recovery()
 
     elif choice == 6:
+        my_polls_str = ''
+        for i in range(len(user.created_list)):
+            my_polls_str += ' '
+            my_polls_str += user.created_list[i]
+            if i != len(user.created_list)-1:
+                my_polls_str += ','
+        print(" ** Your poll ID's :" + my_polls_str + " **")
+        
+    elif choice == 7:
         exit()
 
     else:
@@ -296,7 +307,7 @@ if __name__ == "__main__":
     Poll = PollInit()
     Poll.vote_recovery()
     status = input(" ** Enter your purpose (Register/Login): ")
-    login_email = input(" ** Enter your email: ")
+    login_email = input(" ** Enter your email: ").lower()
     login_password = input(" ** Enter your password: ")
     auth = None
     auth = Authenticator(login_email , login_password)
@@ -305,7 +316,7 @@ if __name__ == "__main__":
         result = log.login()
     elif status == 'Register':
         reapeat_password = input(" ** Enter your password again: ")
-        login_model = input(" ** Enter your character (Admin/User): ")
+        login_model = 'User' # Changable (Admin/User)
         auth.authenticate(reapeat_password, login_model)
         result = log.register(login_model)
     else:
@@ -313,7 +324,6 @@ if __name__ == "__main__":
         input("\n ** Press Enter To Reset **")
         exit()
     user = None
-    print (result)
     if 'Admin' in result:
         user = Admin(login_email , login_password)
     elif 'User' in result:
