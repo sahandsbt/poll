@@ -23,7 +23,7 @@ class PollInit:
     def print_list(self):
         for i in self.vote_list:
             text = i.split(',')
-            print('\n ** ' , text[0] , ',' , text[1] , end = '')
+            print('\n ** ' , text[0] , ',' , text[1] , ',' , text[2] , end = '')
         print('')
     
     def re_ID(self):
@@ -87,6 +87,9 @@ class User:
             for i in range(len(ops)):
                 info = ops[i].split(',')
                 if info[0] == str(ID):
+                    if info[1] == 'deactive':
+                        print("Vote is deactive!")
+                        return
                     ind = info.index(option)
                     info[ind+1] = int(info[ind+1]) + 1
                     txt = ''
@@ -109,7 +112,7 @@ class User:
             options_str += ','
             options_str += str(i)
             options_str += ',0'
-        add = str(ID) + ',' + title + options_str
+        add = str(ID) + ',active,' + title + options_str
         with open('votes.txt','a') as f:
             f.write(add + '\n')
         Poll.vote_list.append(add)
@@ -132,13 +135,52 @@ class User:
                         fi.write(i)
         self.update_lists()
         
-        
+    def change_activation(self,ID):
+        if str(ID) not in self.created_list:
+            print(" ** You didn't create this poll! ")
+            return
+        with open('votes.txt','r') as f:
+            ops = f.readlines()
+            for i in range(len(ops)):
+                info = ops[i].split(',')
+                if info[0] == str(ID):
+                    if info[1] == 'active':
+                        info[1] = 'deactive'
+                    else:
+                        info[1] = 'active'
+                    txt = ''
+                    for j in range(len(info)):
+                        txt = txt + str(info[j])
+                        if j != len(info) - 1:
+                            txt += ','
+                    if re.match(re.compile(r'^[0-9]+'),txt[-1:]):
+                        txt += '\n'
+                    ops[i] = txt
+            with open('votes.txt','w') as fi:
+                for i in ops:
+                    fi.write(i)
+        self.update_lists()
 
 #-----------(Admin)-----------     
 
 class Admin(User):
     def __init__(self,email,password):
         super().__init__(email,password)
+    
+    def delete(self,ID):
+        if str(ID) in self.created_list:
+            self.created_list.remove(str(ID))
+        with open('votes.txt','r') as f:
+            ops = f.readlines()
+            for i in range(len(ops)):
+                info = ops[i].split(',')
+                if info[0] == str(ID):
+                    ops[i] = 'temp'
+            with open('votes.txt','w') as fi:
+                for i in ops:
+                    if 'temp' not in i:
+                        fi.write(i)
+        self.update_lists()
 
 #-----------(Authenticator)-----------
 
@@ -160,6 +202,14 @@ class Authenticator:
             print(" ** Wrong Syntax !")
             input("\n ** Press Enter To Reset **")
             exit()
+
+#-----------(Login)-----------
+
+class Login:
+    def __init__(self, email, password):
+        self.email = email
+        md5_temp = hash.md5(str(password).encode('utf-8'))
+        self.password = md5_temp.hexdigest()
 
     def login(self):
         data = []
@@ -185,7 +235,7 @@ class Authenticator:
 
 def CLI():
     print(" ** Welcome To Poll Project! **\n")
-    print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Delete a poll\n -- 5. Exit")
+    print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Delete a poll\n -- 5. Change activation\n -- 6. Exit")
     choice = int(input(" => "))
 
     if choice == 1:
@@ -213,7 +263,7 @@ def CLI():
             for i in range(len(ops)):
                 info = ops[i].split(',')
                 if info[0] == str(ID):
-                    for j in range(2,len(info),2):
+                    for j in range(3,len(info),2):
                         print(' -> ' , info[j])
         vote = input("Enter your option: ")
         user.participate(ID,vote)
@@ -228,6 +278,12 @@ def CLI():
         Poll.vote_recovery()
 
     elif choice == 5:
+        ID = int(input("\n ** Enter the poll ID:\n => "))
+        user.change_activation(ID)
+        print("\n ** Poll Activation Successfully Changed !")
+        Poll.vote_recovery()
+
+    elif choice == 6:
         exit()
 
     else:
@@ -242,14 +298,15 @@ if __name__ == "__main__":
     status = input(" ** Enter your purpose (Register/Login): ")
     login_email = input(" ** Enter your email: ")
     login_password = input(" ** Enter your password: ")
-    log = None
-    log = Authenticator(login_email , login_password)
+    auth = None
+    auth = Authenticator(login_email , login_password)
+    log = Login(login_email , login_password)
     if status == 'Login':
         result = log.login()
     elif status == 'Register':
         reapeat_password = input(" ** Enter your password again: ")
         login_model = input(" ** Enter your character (Admin/User): ")
-        log.authenticate(reapeat_password, login_model)
+        auth.authenticate(reapeat_password, login_model)
         result = log.register(login_model)
     else:
         print("\n ** Wrong Syntax !")
