@@ -79,7 +79,7 @@ class User:
 
     def participate(self,ID,option):
         if str(ID) in self.participated_list:
-            print("You participated before!")
+            print(" ** You participated before! **")
             return
         self.participated_list.append(str(ID))
         with open('data/votes.txt','r') as f:
@@ -88,7 +88,7 @@ class User:
                 info = ops[i].split(',')
                 if info[0] == str(ID):
                     if info[1] == 'deactive':
-                        print("Vote is deactive!")
+                        print(" ** Vote is deactive! **")
                         return
                     ind = info.index(option)
                     info[ind+1] = int(info[ind+1]) + 1
@@ -104,7 +104,7 @@ class User:
                 for i in ops:
                     fi.write(i)
         self.update_lists()
-        print("\n ** Poll Successfully Voted !")
+        print("\n ** Poll Successfully Voted! **")
 
     def create(self,ID,title,options):
         self.created_list.append(str(ID))
@@ -118,11 +118,11 @@ class User:
             f.write(add + '\n')
         Poll.vote_list.append(add)
         self.update_lists()
-        print("\n ** Poll Successfully Created !")
+        print("\n ** Poll Successfully Created! **")
     
     def delete(self,ID):
         if str(ID) not in self.created_list:
-            print(" ** You didn't create this poll! ")
+            print(" ** You didn't create this poll! **")
             return
         self.created_list.remove(str(ID))
         with open('data/votes.txt','r') as f:
@@ -136,11 +136,11 @@ class User:
                     if 'temp' not in i:
                         fi.write(i)
         self.update_lists()
-        print("\n ** Poll Successfully deleted !")
+        print("\n ** Poll Successfully deleted! **")
         
     def change_activation(self,ID):
         if str(ID) not in self.created_list:
-            print(" ** You didn't create this poll! ")
+            print(" ** You didn't create this poll! **")
             return
         with open('data/votes.txt','r') as f:
             ops = f.readlines()
@@ -163,7 +163,7 @@ class User:
                 for i in ops:
                     fi.write(i)
         self.update_lists()
-        print("\n ** Poll Activation Successfully Changed !")
+        print("\n ** Poll Activation Successfully Changed! **")
 
 #-----------(Admin)-----------     
 
@@ -185,7 +185,7 @@ class Admin(User):
                     if 'temp' not in i:
                         fi.write(i)
         self.update_lists()
-        print("\n ** Poll Successfully deleted !")
+        print("\n ** Poll Successfully deleted! **")
 
 #-----------(Authenticator)-----------
 
@@ -201,11 +201,11 @@ class Authenticator:
         email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
         password_regex = re.compile(r'[a-zA-Z]+')
         if not re.match(email_regex, self.email) or not re.match(password_regex, self.password):
-            print(" ** Wrong Email / Password Syntax !")
+            print(" ** Wrong Email / Password Syntax! **")
             input("\n ** Press Enter To Reset **")
             exit()
         if model not in ['Admin','User'] or self.password != repeat_password:
-            print(" ** Wrong Syntax !")
+            print(" ** Wrong Syntax! **")
             input("\n ** Press Enter To Reset **")
             exit()
 
@@ -270,7 +270,7 @@ def CLI():
                 if info[0] == str(ID):
                     for j in range(3,len(info),2):
                         print(' -> ' , info[j])
-        vote = input("Enter your option: ")
+        vote = input(" ** Enter your option: ")
         user.participate(ID,vote)
         user.recover()
 
@@ -298,7 +298,7 @@ def CLI():
         exit()
 
     else:
-        print("\n ** Wrong Syntax !")
+        print("\n ** Wrong Syntax! **")
     input("\n ** Press Enter To Reset **")
 
 #-----------(Main)----------- 
@@ -320,7 +320,7 @@ if __name__ == "__main__":
         auth.authenticate(reapeat_password, login_model)
         result = log.register(login_model)
     else:
-        print("\n ** Wrong Syntax !")
+        print("\n ** Wrong Syntax! **")
         input("\n ** Press Enter To Reset **")
         exit()
     user = None
@@ -329,7 +329,7 @@ if __name__ == "__main__":
     elif 'User' in result:
         user = User(login_email , login_password)
     else:
-        print(" ** Wrong email Or Password !")
+        print(" ** Wrong email Or Password! **")
         input("\n ** Press Enter To Exit **")
         exit()
     user.recover()
