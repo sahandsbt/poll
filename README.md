@@ -1,6 +1,5 @@
-# Poll_Project
-A poll project by Sahand Sabet with python object oriented
-
+# Polling System
+A polling system project by Sahand Sabet with python object oriented.
 Please keep the copy right of project, I really worked hard for this and i trust you <3
 
 1- Poll project with Admin and Participator users
