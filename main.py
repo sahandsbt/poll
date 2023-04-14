@@ -113,7 +113,7 @@ class User:
         self.update_lists()
         print("\n ** Poll Successfully Voted! **")
 
-    def create(self,ID,title,options):
+    def create(self,Poll_obj,ID,title,options):
         self.created_list.append(str(ID))
         options_str = ''
         for i in options:
@@ -123,7 +123,7 @@ class User:
         add = str(ID) + ',active,' + title + options_str
         with open('data/votes.txt','a') as f:
             f.write(add + '\n')
-        Poll.vote_list.append(add)
+        Poll_obj.vote_list.append(add)
         self.update_lists()
         print("\n ** Poll Successfully Created! **")
     
@@ -246,7 +246,7 @@ class Login:
 
 #-----------(CLI)----------- 
 
-def CLI():
+def CLI(Poll_obj,User):
     print(" ** Welcome To Poll Project! **\n")
     print(" -- 1. Create a new poll\n -- 2. List of polls\n -- 3. Participate in a poll\n -- 4. Delete a poll\n -- 5. Change activation\n -- 6. My polls\n -- 7. Exit")
     choice = int(input(" => "))
@@ -262,11 +262,11 @@ def CLI():
         with open('data/votes.txt','r') as f:
             temp = f.readlines()
             ID_maker = len(temp)
-        user.create(ID_maker,title,options)
-        Poll.vote_recovery()
+        User.create(Poll_obj,ID_maker,title,options)
+        Poll_obj.vote_recovery()
 
     elif choice == 2:
-        Poll.print_list()
+        Poll_obj.print_list()
 
     elif choice == 3:
         ID = int(input("\n ** Enter the poll ID:\n => "))
@@ -278,26 +278,26 @@ def CLI():
                     for j in range(3,len(info),2):
                         print(' -> ' , info[j])
         vote = input(" ** Enter your option: ")
-        user.participate(ID,vote)
-        user.recover()
+        User.participate(ID,vote)
+        User.recover()
 
     elif choice == 4:
         ID = int(input("\n ** Enter the poll ID:\n => "))
-        user.delete(ID)
-        Poll.re_ID()
-        Poll.vote_recovery()
+        User.delete(ID)
+        Poll_obj.re_ID()
+        Poll_obj.vote_recovery()
 
     elif choice == 5:
         ID = int(input("\n ** Enter the poll ID:\n => "))
-        user.change_activation(ID)
-        Poll.vote_recovery()
+        User.change_activation(ID)
+        Poll_obj.vote_recovery()
 
     elif choice == 6:
         my_polls_str = ''
-        for i in range(len(user.created_list)):
+        for i in range(len(User.created_list)):
             my_polls_str += ' '
-            my_polls_str += user.created_list[i]
-            if i != len(user.created_list)-1:
+            my_polls_str += User.created_list[i]
+            if i != len(User.created_list)-1:
                 my_polls_str += ','
         print(" ** Your poll ID's :" + my_polls_str + " **")
         
@@ -310,7 +310,7 @@ def CLI():
 
 #-----------(Main)----------- 
 
-if __name__ == "__main__":
+def main():
     Poll = PollInit()
     Poll.vote_recovery()
     status = input(" ** Enter your purpose (Register/Login): ")
@@ -330,7 +330,6 @@ if __name__ == "__main__":
         print("\n ** Wrong Syntax! **")
         input("\n ** Press Enter To Reset **")
         exit()
-    user = None
     if 'Admin' in result:
         user = Admin(login_email , login_password)
     elif 'User' in result:
@@ -342,5 +341,10 @@ if __name__ == "__main__":
     user.recover()
     os.system('cls' if os.name=='nt' else 'clear')
     while True:
-        CLI()
+        CLI(Poll,user)
         os.system('cls' if os.name=='nt' else 'clear')
+
+#-----------(Init)----------- 
+
+if __name__ == "__main__":  
+    main()
