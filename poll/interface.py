@@ -66,4 +66,5 @@ class UserInterface:
 
         else:
             print("\n ** Wrong Syntax! **")
+            
         input("\n ** Press Enter To Reset **")

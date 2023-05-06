@@ -123,8 +123,6 @@ class User:
         self.update_lists()
         print("\n ** Poll Activation Successfully Changed! **")
 
-#-----------(Admin)-----------     
-
 class Admin(User):
     def __init__(self,email,password):
         super().__init__(email,password)

@@ -21,8 +21,6 @@ class Authenticator:
             input("\n ** Press Enter To Reset **")
             exit()
 
-#-----------(Login)-----------
-
 class Login:
     def __init__(self, email, password):
         self.email = email

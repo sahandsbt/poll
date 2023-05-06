@@ -15,6 +15,7 @@ class PollInit:
                 pass
             with open('data/votes.txt','x') as f:
                 pass
+        
     def print_list(self):
         for i in self.vote_list:
             text = i.split(',')
