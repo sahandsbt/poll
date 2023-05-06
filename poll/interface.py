@@ -18,7 +18,11 @@ class UserInterface:
                 options.append(option)
             with open('data/votes.txt','r') as f:
                 temp = f.readlines()
-                ID_maker = len(temp)
+            try:
+                ID_maker = temp[len(temp)-1].split(',')
+                ID_maker = int(ID_maker[0]) + 1
+            except:
+                ID_maker = 0
             self.User.create(self.Poll_obj,ID_maker,title,options)
             self.Poll_obj.vote_recovery()
 
@@ -41,7 +45,6 @@ class UserInterface:
         elif choice == 4:
             ID = int(input("\n ** Enter the poll ID:\n => "))
             self.User.delete(ID)
-            self.Poll_obj.re_ID()
             self.Poll_obj.vote_recovery()
 
         elif choice == 5:

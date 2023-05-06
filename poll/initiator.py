@@ -20,17 +20,4 @@ class PollInit:
             text = i.split(',')
             print('\n ** ' , text[0] , ',' , text[1] , ',' , text[2] , end = '')
         print('')
-
-    def re_ID(self):
-        votes = []
-        with open('data/votes.txt','r') as f:
-            votes = f.readlines()
-        for i in range(len(votes)):
-            temp = votes[i].split(',')
-            vote_str = str(i)
-            for j in range(1,len(temp)):
-                vote_str = vote_str + ',' + str(temp[j])
-            votes[i] = vote_str
-        with open('data/votes.txt','w') as f:
-            for i in votes:
-                f.write(i)
+        
